@@ -51,6 +51,9 @@ Thumbs.db
 
 # Supabase
 .supabase
+supabase/.temp/
+supabase/.branches/
+supabase/.cache/
 
 # Prompt files
 *.md
