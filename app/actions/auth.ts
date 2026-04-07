@@ -5,7 +5,10 @@ import { revalidatePath } from 'next/cache'
 import { loginSchema, signupSchema } from '@/lib/validations/auth'
 import { login, signup, logout } from '@/services/auth.service'
 
-export async function loginAction(formData: FormData) {
+export async function loginAction(
+  prevState: { error: string } | null,
+  formData: FormData
+) {
   try {
     const rawData = {
       email: formData.get('email') as string,
@@ -25,7 +28,10 @@ export async function loginAction(formData: FormData) {
   redirect('/dashboard')
 }
 
-export async function signupAction(formData: FormData) {
+export async function signupAction(
+  prevState: { error: string } | null,
+  formData: FormData
+) {
   try {
     const rawData = {
       email: formData.get('email') as string,
