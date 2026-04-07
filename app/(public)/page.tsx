@@ -1,14 +1,10 @@
-import { createClient } from '@/lib/supabase/server'
-
-export default async function HomePage() {
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('pg_tables')
-    .select('*')
-    .limit(1)
-
+export default function HomePage() {
   return (
-    <pre>{JSON.stringify({ data, error }, null, 2)}</pre>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">Welcome to Social Marketplace</h1>
+        <p className="text-lg text-gray-600">Connect with trainers and book sessions</p>
+      </div>
+    </div>
   )
 }
