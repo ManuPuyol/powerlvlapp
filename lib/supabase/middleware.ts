@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
 
 const AUTH_ROUTES = ['/login', '/signup']
+const ONBOARDING_ROUTE = '/onboarding'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -31,15 +32,29 @@ export async function updateSession(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const path = request.nextUrl.pathname
   const isAuthRoute = AUTH_ROUTES.some(route => path.startsWith(route))
+  const isOnboardingRoute = path.startsWith(ONBOARDING_ROUTE)
 
-  // No logueado intentando acceder a cualquier ruta que no sea de auth → /login
+  // No logueado → /login
   if (!user && !isAuthRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Logueado intentando acceder a login/signup → /dashboard
+  // Logueado + ruta de auth → /dashboard
   if (user && isAuthRoute) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
+
+  // Logueado → verificar onboarding
+  if (user && !isAuthRoute && !isOnboardingRoute) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('onboarding_completed')
+      .eq('id', user.id)
+      .single()
+
+    if (profile && !profile.onboarding_completed) {
+      return NextResponse.redirect(new URL('/onboarding', request.url))
+    }
   }
 
   return supabaseResponse
