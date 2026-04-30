@@ -49,7 +49,7 @@ export async function signupAction(
     return { error: 'An unexpected error occurred' }
   }
 
-  redirect('/dashboard')
+  redirect('/onboarding')
 }
 
 export async function logoutAction() {
