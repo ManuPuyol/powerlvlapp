@@ -60,3 +60,24 @@ export async function getTrainerByUsername(username: string) {
 
   return data
 }
+
+/**
+ * Obtiene el perfil del usuario actual
+ */
+export async function getCurrentProfile() {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, username, avatar_url, is_trainer')
+    .eq('id', user.id)
+    .single()
+
+  if (error) return null
+
+  return data
+}
