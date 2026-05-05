@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils/cn'
 import { logoutAction } from '@/app/actions/auth'
+import { Avatar } from '@/components/shared/avatar'
 
 type NavItem = {
   label: string
@@ -18,6 +19,7 @@ type NavItem = {
 type SidebarProps = {
   isTrainer: boolean
   fullName: string | null
+  avatarUrl: string | null
 }
 
 function NavItems({ items, pathname, onNavigate }: {
@@ -47,7 +49,7 @@ function NavItems({ items, pathname, onNavigate }: {
   )
 }
 
-export function Sidebar({ isTrainer, fullName }: SidebarProps) {
+export function Sidebar({ isTrainer, fullName, avatarUrl }: SidebarProps) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
@@ -72,9 +74,12 @@ export function Sidebar({ isTrainer, fullName }: SidebarProps) {
   const SidebarContent = ({ onNavigate }: { onNavigate?: () => void }) => (
     <div className="flex flex-col h-full py-4 px-3">
       {/* Logo */}
-      <div className="px-3 mb-6">
-        <h1 className="font-bold text-lg">PowerLvl</h1>
-        <p className="text-xs text-muted-foreground">{fullName}</p>
+      <div className="px-3 mb-6 flex items-center gap-3">
+        <Avatar src={avatarUrl} name={fullName} size="sm" />
+        <div>
+          <h1 className="font-bold text-sm">PowerLvl</h1>
+          <p className="text-xs text-muted-foreground">{fullName}</p>
+        </div>
       </div>
 
       {/* Nav */}

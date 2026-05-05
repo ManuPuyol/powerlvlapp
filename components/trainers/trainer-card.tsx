@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Avatar } from '@/components/shared/avatar'
 import type { Profile } from '@/types/models'
 
 type TrainerCardProps = {
@@ -12,9 +13,7 @@ export function TrainerCard({ trainer }: TrainerCardProps) {
     <Link href={`/trainers/${trainer.username}`}>
       <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
         <CardHeader className="flex flex-row items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center text-lg font-semibold">
-            {trainer.full_name?.charAt(0) ?? '?'}
-          </div>
+          <Avatar src={trainer.avatar_url} name={trainer.full_name} size="md" />
           <div>
             <p className="font-semibold">{trainer.full_name}</p>
             <p className="text-sm text-muted-foreground">@{trainer.username}</p>

@@ -13,6 +13,7 @@ export default async function DashboardLayout({
       <Sidebar
         isTrainer={profile?.is_trainer ?? false}
         fullName={profile?.full_name ?? null}
+        avatarUrl={profile?.avatar_url ?? null}
       />
       <main className="flex-1 overflow-y-auto">
         {children}

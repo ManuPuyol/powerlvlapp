@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/services/profile.service'
 import { ProfileForm } from '@/components/dashboard/profile-form'
+import { AvatarUpload } from '@/components/dashboard/avatar-upload'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 
 export default async function ProfilePage() {
   const profile = await getCurrentProfile()
@@ -17,6 +19,21 @@ export default async function ProfilePage() {
         <p className="text-muted-foreground">Update your personal information</p>
       </div>
 
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>Profile Photo</CardTitle>
+          <CardDescription>
+            This photo will be visible to other users
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AvatarUpload
+            currentAvatarUrl={profile.avatar_url}
+            fullName={profile.full_name}
+          />
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Profile Information</CardTitle>
@@ -28,10 +45,7 @@ export default async function ProfilePage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-        <ProfileForm
-            profile={profile}
-            profileVersion={new Date(profile.updated_at ?? '').getTime()}
-          />
+          <ProfileForm profile={profile} />
         </CardContent>
       </Card>
     </div>

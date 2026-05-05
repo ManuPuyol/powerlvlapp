@@ -94,3 +94,49 @@ export async function updateProfileAction(
 
   return { error: null }
 }
+
+export async function uploadAvatarAction(
+  prevState: { error: string } | { error: null } | null,
+  formData: FormData
+) {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) {
+      return { error: 'Not authenticated' }
+    }
+
+    const file = formData.get('avatar') as File
+
+    if (!file || file.size === 0) {
+      return { error: 'No file selected' }
+    }
+
+    // Validar tamaño (2MB max)
+    if (file.size > 2 * 1024 * 1024) {
+      return { error: 'File too large. Max 2MB' }
+    }
+
+    // Validar tipo
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      return { error: 'Invalid file type. Use JPG, PNG or WebP' }
+    }
+
+    // Subir imagen
+    const { uploadAvatar } = await import('@/services/storage.service')
+    const publicUrl = await uploadAvatar(user.id, file)
+
+    // Actualizar perfil con la URL
+    await updateProfile(user.id, { avatar_url: publicUrl })
+
+    revalidatePath('/dashboard/profile')
+  } catch (error) {
+    if (error instanceof Error) {
+      return { error: error.message }
+    }
+    return { error: 'An unexpected error occurred' }
+  }
+
+  return { error: null }
+}

@@ -91,6 +91,7 @@ export async function updateProfile(
   data: {
     full_name?: string
     username?: string
+    avatar_url?: string
     bio?: string
     specialties?: string[]
     price_per_session?: number

@@ -3,6 +3,7 @@ import { getTrainerByUsername } from '@/services/profile.service'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Avatar } from '@/components/shared/avatar'
 
 type Props = {
   params: Promise<{ username: string }>
@@ -24,9 +25,7 @@ export default async function TrainerProfilePage({ params }: Props) {
 
           {/* Header */}
           <div className="flex items-center gap-4">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center text-3xl font-semibold">
-              {trainer.full_name?.charAt(0) ?? '?'}
-            </div>
+            <Avatar src={trainer.avatar_url} name={trainer.full_name} size="lg" />
             <div>
               <h1 className="text-2xl font-bold">{trainer.full_name}</h1>
               <p className="text-muted-foreground">@{trainer.username}</p>
