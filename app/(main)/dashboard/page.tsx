@@ -1,33 +1,114 @@
 import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/services/auth.service'
-import { logoutAction } from '@/app/actions/auth'
+import Link from 'next/link'
+import { getCurrentProfile } from '@/services/profile.service'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Users, Dumbbell, User } from 'lucide-react'
 
 export default async function DashboardPage() {
-  const user = await getCurrentUser()
+  const profile = await getCurrentProfile()
 
-  if (!user) {
+  if (!profile) {
     redirect('/login')
   }
 
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Dashboard</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            Welcome, <span className="font-medium text-foreground">{user.email}</span>
-          </p>
-          <form action={logoutAction}>
-            <Button type="submit" variant="destructive" className="w-full">
-              Log Out
+  if (profile.is_trainer) {
+    return (
+      <div className="p-6 space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">Welcome back, {profile.full_name?.split(' ')[0]}</h1>
+          <p className="text-muted-foreground">Here's what's happening with your training business</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Active Clients</CardTitle>
+              <Users size={16} className="text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-2xl font-bold">0</p>
+              <p className="text-xs text-muted-foreground">No active contracts yet</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Profile Status</CardTitle>
+              <User size={16} className="text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <Badge variant={profile.is_trainer ? 'default' : 'secondary'}>
+                Trainer
+              </Badge>
+              <p className="text-xs text-muted-foreground mt-1">Your public profile is active</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Availability</CardTitle>
+              <Dumbbell size={16} className="text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <Badge variant="secondary">Available</Badge>
+              <p className="text-xs text-muted-foreground mt-1">You can receive new clients</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Manage your trainer profile</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <Button asChild variant="outline">
+              <Link href={`/trainers/${profile.username}`}>View Public Profile</Link>
             </Button>
-          </form>
-        </CardContent>
-      </Card>
+            <Button asChild variant="outline">
+              <Link href="/dashboard/profile">Edit Profile</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  // User dashboard
+  return (
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Welcome back, {profile.full_name?.split(' ')[0]}</h1>
+        <p className="text-muted-foreground">Find and connect with the best trainers</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">My Trainers</CardTitle>
+            <Users size={16} className="text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold">0</p>
+            <p className="text-xs text-muted-foreground">No active trainers yet</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium">Available Trainers</CardTitle>
+            <Dumbbell size={16} className="text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <p className="text-xs text-muted-foreground mb-3">Browse trainers and find your perfect match</p>
+            <Button asChild size="sm">
+              <Link href="/trainers">Find a Trainer</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
