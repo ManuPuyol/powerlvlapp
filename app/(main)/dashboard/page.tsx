@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentProfile } from '@/services/profile.service'
@@ -6,7 +7,24 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Users, Dumbbell, User } from 'lucide-react'
 
-export default async function DashboardPage() {
+function DashboardSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {[1, 2, 3].map(i => (
+        <Card key={i}>
+          <CardHeader>
+            <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+          </CardHeader>
+          <CardContent>
+            <div className="h-8 w-12 bg-muted animate-pulse rounded" />
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  )
+}
+
+async function DashboardContent() {
   const profile = await getCurrentProfile()
 
   if (!profile) {
@@ -15,10 +33,10 @@ export default async function DashboardPage() {
 
   if (profile.is_trainer) {
     return (
-      <div className="p-6 space-y-6">
+      <>
         <div>
           <h1 className="text-2xl font-bold">Welcome back, {profile.full_name?.split(' ')[0]}</h1>
-          <p className="text-muted-foreground">Here's what's happening with your training business</p>
+          <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your training business</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -39,9 +57,7 @@ export default async function DashboardPage() {
               <User size={16} className="text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <Badge variant={profile.is_trainer ? 'default' : 'secondary'}>
-                Trainer
-              </Badge>
+              <Badge variant="default">Trainer</Badge>
               <p className="text-xs text-muted-foreground mt-1">Your public profile is active</p>
             </CardContent>
           </Card>
@@ -72,13 +88,13 @@ export default async function DashboardPage() {
             </Button>
           </CardContent>
         </Card>
-      </div>
+      </>
     )
   }
 
   // User dashboard
   return (
-    <div className="p-6 space-y-6">
+    <>
       <div>
         <h1 className="text-2xl font-bold">Welcome back, {profile.full_name?.split(' ')[0]}</h1>
         <p className="text-muted-foreground">Find and connect with the best trainers</p>
@@ -109,6 +125,16 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+    </>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <div className="p-6 space-y-6">
+      <Suspense fallback={<DashboardSkeleton />}>
+        <DashboardContent />
+      </Suspense>
     </div>
   )
 }

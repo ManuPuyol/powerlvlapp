@@ -74,7 +74,7 @@ export async function getCurrentProfile() {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, username, avatar_url, is_trainer, bio, specialties, price_per_session, is_available, updated_at')
+    .select('id, full_name, username, avatar_url, is_trainer, bio, specialties, price_per_session, is_available, updated_at, onboarding_completed')
     .eq('id', user.id)
     .single()
 

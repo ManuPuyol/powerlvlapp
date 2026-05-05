@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/services/profile.service'
 import { Sidebar } from '@/components/shared/sidebar'
 
@@ -7,6 +8,11 @@ export default async function DashboardLayout({
   children: React.ReactNode
 }) {
   const profile = await getCurrentProfile()
+
+  // Si no ha completado onboarding, redirigir
+  if (profile && !profile.onboarding_completed) {
+    redirect('/onboarding')
+  }
 
   return (
     <div className="flex min-h-screen">
