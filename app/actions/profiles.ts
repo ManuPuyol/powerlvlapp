@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { onboardingSchema, baseProfileSchema, trainerProfileSchema } from '@/lib/validations/profile'
+import { onboardingSchema, baseProfileSchema, trainerProfileSchema, visibilitySchema } from '@/lib/validations/profile'
 import { completeOnboarding, updateProfile } from '@/services/profile.service'
 import { getCurrentUser } from '@/services/auth.service'
 
@@ -131,6 +131,35 @@ export async function uploadAvatarAction(
     await updateProfile(user.id, { avatar_url: publicUrl })
 
     revalidatePath('/dashboard/profile')
+  } catch (error) {
+    if (error instanceof Error) {
+      return { error: error.message }
+    }
+    return { error: 'An unexpected error occurred' }
+  }
+
+  return { error: null }
+}
+
+export async function updateVisibilityAction(
+  prevState: { error: string } | { error: null } | null,
+  formData: FormData
+) {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) {
+      return { error: 'Not authenticated' }
+    }
+
+    const rawData = {
+      visibility: formData.get('visibility') as string,
+    }
+
+    const validated = visibilitySchema.parse(rawData)
+    await updateProfile(user.id, { profile_visibility: validated.visibility })
+
+    revalidatePath('/dashboard/settings')
   } catch (error) {
     if (error instanceof Error) {
       return { error: error.message }

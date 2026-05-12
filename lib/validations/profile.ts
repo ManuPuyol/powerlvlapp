@@ -24,3 +24,9 @@ export const trainerProfileSchema = baseProfileSchema.extend({
 
 export type BaseProfileInput = z.infer<typeof baseProfileSchema>
 export type TrainerProfileInput = z.infer<typeof trainerProfileSchema>
+
+export const visibilitySchema = z.object({
+  visibility: z.enum(['public', 'private']),
+})
+
+export type VisibilityInput = z.infer<typeof visibilitySchema>

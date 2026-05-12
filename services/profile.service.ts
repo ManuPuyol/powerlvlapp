@@ -74,7 +74,7 @@ export async function getCurrentProfile() {
 
   const { data, error } = await supabase
     .from('profiles')
-    .select('id, full_name, username, avatar_url, is_trainer, bio, specialties, price_per_session, is_available, updated_at, onboarding_completed')
+    .select('id, full_name, username, avatar_url, is_trainer, bio, specialties, price_per_session, is_available, updated_at, onboarding_completed, profile_visibility')
     .eq('id', user.id)
     .single()
 
@@ -96,6 +96,7 @@ export async function updateProfile(
     specialties?: string[]
     price_per_session?: number
     is_available?: boolean
+    profile_visibility?: string
   }
 ) {
   const supabase = await createClient()
