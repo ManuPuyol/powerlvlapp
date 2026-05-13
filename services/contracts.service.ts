@@ -82,3 +82,20 @@ export async function updateContractStatus(contractId: string, status: string) {
         throw new Error(error.message)
     }
 }
+
+/**
+ * Obtiene el contrato entre un usuario y un trainer (si existe)
+ */
+export async function getContractBetween(clientId: string, trainerId: string) {
+  const supabase = await createClient()
+
+  const { data } = await supabase
+    .from('contracts')
+    .select('id, status')
+    .eq('client_id', clientId)
+    .eq('trainer_id', trainerId)
+    .in('status', ['pending', 'active'])
+    .single()
+
+  return data
+}

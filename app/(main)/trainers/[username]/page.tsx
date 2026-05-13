@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation'
-import { getTrainerByUsername } from '@/services/profile.service'
+import { getTrainerByUsername, getCurrentProfile } from '@/services/profile.service'
+import { getContractBetween } from '@/services/contracts.service'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar } from '@/components/shared/avatar'
+import { HireButton } from '@/components/trainers/hire-button'
 
 type Props = {
   params: Promise<{ username: string }>
@@ -17,6 +18,11 @@ export default async function TrainerProfilePage({ params }: Props) {
   if (!trainer) {
     notFound()
   }
+
+  const profile = await getCurrentProfile()
+  const existingContract = profile
+    ? await getContractBetween(profile.id, trainer.id)
+    : null
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -63,9 +69,7 @@ export default async function TrainerProfilePage({ params }: Props) {
                 ${trainer.price_per_session} <span className="text-sm font-normal text-muted-foreground">/ session</span>
               </p>
             )}
-            <Button disabled>
-              Contact Trainer
-            </Button>
+            <HireButton trainerId={trainer.id} contractStatus={existingContract?.status ?? null} />
           </div>
 
         </CardContent>
