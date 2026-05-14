@@ -2,10 +2,12 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentProfile } from '@/services/profile.service'
+import { getContractsByTrainer } from '@/services/contracts.service'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Users, Dumbbell, User } from 'lucide-react'
+import { PendingContracts } from '@/components/dashboard/pending-contracts'
 
 function DashboardSkeleton() {
   return (
@@ -32,12 +34,21 @@ async function DashboardContent() {
   }
 
   if (profile.is_trainer) {
+    const contracts = await getContractsByTrainer(profile.id).catch((e) => {
+      console.error('Error fetching contracts:', e.message)
+      return []
+    })
+    const pendingContracts = contracts.filter((c: any) => c.status === 'pending')
+    const activeContracts = contracts.filter((c: any) => c.status === 'active')
+
     return (
       <>
         <div>
           <h1 className="text-2xl font-bold">Welcome back, {profile.full_name?.split(' ')[0]}</h1>
           <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your training business</p>
         </div>
+
+        <PendingContracts contracts={pendingContracts} />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
@@ -46,8 +57,10 @@ async function DashboardContent() {
               <Users size={16} className="text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">0</p>
-              <p className="text-xs text-muted-foreground">No active contracts yet</p>
+              <p className="text-2xl font-bold">{activeContracts.length}</p>
+              <p className="text-xs text-muted-foreground">
+                {activeContracts.length === 0 ? 'No active contracts yet' : 'Active contracts'}
+              </p>
             </CardContent>
           </Card>
 
