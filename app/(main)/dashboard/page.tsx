@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentProfile } from '@/services/profile.service'
-import { getContractsByTrainer } from '@/services/contracts.service'
+import { getContractsByTrainer, getContractsByClient } from '@/services/contracts.service'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -106,6 +106,10 @@ async function DashboardContent() {
   }
 
   // User dashboard
+  const userContracts = await getContractsByClient(profile.id).catch(() => [])
+  const activeTrainers = userContracts.filter((c: any) => c.status === 'active')
+  const pendingRequests = userContracts.filter((c: any) => c.status === 'pending')
+
   return (
     <>
       <div>
@@ -120,8 +124,15 @@ async function DashboardContent() {
             <Users size={16} className="text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold">0</p>
-            <p className="text-xs text-muted-foreground">No active trainers yet</p>
+            <p className="text-2xl font-bold">{activeTrainers.length}</p>
+            <p className="text-xs text-muted-foreground">
+              {activeTrainers.length === 0 ? 'No active trainers yet' : 'Active trainers'}
+            </p>
+            {pendingRequests.length > 0 && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {pendingRequests.length} pending request{pendingRequests.length > 1 ? 's' : ''}
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -138,6 +149,28 @@ async function DashboardContent() {
           </CardContent>
         </Card>
       </div>
+
+      {activeTrainers.length > 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <h3 className="font-semibold mb-4">My Active Trainers</h3>
+            <div className="space-y-3">
+              {activeTrainers.map((contract: any) => (
+                <Link
+                  key={contract.id}
+                  href={`/trainers/${contract.trainer?.username}`}
+                  className="flex items-center gap-3 p-3 border rounded-md hover:bg-muted transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-semibold">
+                    {contract.trainer?.full_name?.charAt(0) ?? '?'}
+                  </div>
+                  <span className="text-sm font-medium">{contract.trainer?.full_name}</span>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </>
   )
 }
