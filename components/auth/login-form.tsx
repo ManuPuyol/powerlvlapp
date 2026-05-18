@@ -41,6 +41,7 @@ export function LoginForm() {
           name="email"
           type="email"
           placeholder="you@example.com"
+          defaultValue="admin@admin.com"
           required
         />
       </div>
@@ -52,6 +53,7 @@ export function LoginForm() {
           name="password"
           type="password"
           placeholder="••••••••"
+          defaultValue="Admin123!"
           required
         />
       </div>

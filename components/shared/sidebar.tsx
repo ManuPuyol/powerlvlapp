@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import { Menu, LayoutDashboard, Users, User, Settings, LogOut, Dumbbell } from 'lucide-react'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils/cn'
 import { logoutAction } from '@/app/actions/auth'
@@ -152,6 +153,9 @@ export function Sidebar({ isTrainer, fullName, avatarUrl }: SidebarProps) {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-72 p-0">
+            <VisuallyHidden>
+              <SheetTitle>Navigation</SheetTitle>
+            </VisuallyHidden>
             <SidebarContent onNavigate={() => setOpen(false)} />
           </SheetContent>
         </Sheet>
