@@ -12,7 +12,6 @@ type Props = {
 
 export default async function TrainerProfilePage({ params }: Props) {
   const { username } = await params
-
   const trainer = await getTrainerByUsername(username).catch(() => null)
 
   if (!trainer) {
@@ -25,49 +24,58 @@ export default async function TrainerProfilePage({ params }: Props) {
     : null
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto px-4 md:px-8 py-8 animate-fade-in-up">
       <Card>
-        <CardContent className="pt-6 space-y-6">
+        <CardContent className="p-6 md:p-8 space-y-6">
 
           {/* Header */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-4 pb-6 border-b">
             <Avatar src={trainer.avatar_url} name={trainer.full_name} size="lg" />
-            <div>
-              <h1 className="text-2xl font-bold">{trainer.full_name}</h1>
-              <p className="text-muted-foreground">@{trainer.username}</p>
-              {trainer.is_available
-                ? <Badge variant="secondary" className="mt-1">Available</Badge>
-                : <Badge variant="outline" className="mt-1">Not available</Badge>
-              }
+            <div className="flex-1 space-y-2">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{trainer.full_name}</h1>
+                <p className="text-muted-foreground">@{trainer.username}</p>
+              </div>
+              {trainer.is_available ? (
+                <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  Available for new clients
+                </div>
+              ) : (
+                <Badge variant="outline">Not available</Badge>
+              )}
             </div>
           </div>
 
           {/* Bio */}
           {trainer.bio && (
-            <div>
-              <h2 className="font-semibold mb-1">About</h2>
-              <p className="text-muted-foreground">{trainer.bio}</p>
+            <div className="space-y-2">
+              <h2 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">About</h2>
+              <p className="leading-relaxed">{trainer.bio}</p>
             </div>
           )}
 
           {/* Specialties */}
           {trainer.specialties && trainer.specialties.length > 0 && (
-            <div>
-              <h2 className="font-semibold mb-2">Specialties</h2>
+            <div className="space-y-2">
+              <h2 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Specialties</h2>
               <div className="flex flex-wrap gap-2">
                 {trainer.specialties.map(specialty => (
-                  <Badge key={specialty} variant="outline">{specialty}</Badge>
+                  <Badge key={specialty} variant="secondary" className="font-normal">
+                    {specialty}
+                  </Badge>
                 ))}
               </div>
             </div>
           )}
 
           {/* Price + CTA */}
-          <div className="flex items-center justify-between pt-4 border-t">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6 border-t">
             {trainer.price_per_session && (
-              <p className="text-lg font-semibold">
-                ${trainer.price_per_session} <span className="text-sm font-normal text-muted-foreground">/ session</span>
-              </p>
+              <div>
+                <p className="text-3xl font-bold">${trainer.price_per_session}</p>
+                <p className="text-sm text-muted-foreground">per session</p>
+              </div>
             )}
             <HireButton trainerId={trainer.id} contractStatus={existingContract?.status ?? null} />
           </div>

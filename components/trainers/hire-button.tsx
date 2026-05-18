@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { hireTrainerAction } from '@/app/actions/contracts'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
+import { Check, Clock } from 'lucide-react'
 
 type HireButtonProps = {
   trainerId: string
@@ -16,21 +16,28 @@ export function HireButton({ trainerId, contractStatus }: HireButtonProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Si ya hay contrato, mostrar estado
   if (contractStatus === 'pending') {
-    return <Badge variant="secondary">Request Pending</Badge>
+    return (
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted text-muted-foreground text-sm font-medium">
+        <Clock size={16} />
+        Request Pending
+      </div>
+    )
   }
 
   if (contractStatus === 'active') {
-    return <Badge variant="default">Active Contract</Badge>
+    return (
+      <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/10 text-primary text-sm font-medium">
+        <Check size={16} />
+        Active Contract
+      </div>
+    )
   }
 
   async function handleHire() {
     setLoading(true)
     setError(null)
-
     const result = await hireTrainerAction(trainerId)
-
     if (result?.error) {
       setError(result.error)
       setLoading(false)
@@ -41,11 +48,11 @@ export function HireButton({ trainerId, contractStatus }: HireButtonProps) {
   }
 
   return (
-    <div>
-      <Button onClick={handleHire} disabled={loading}>
-        {loading ? 'Sending request...' : 'Hire Trainer'}
+    <div className="space-y-2">
+      <Button onClick={handleHire} disabled={loading} size="lg">
+        {loading ? 'Sending...' : 'Hire Trainer'}
       </Button>
-      {error && <p className="text-sm text-destructive mt-2">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   )
 }

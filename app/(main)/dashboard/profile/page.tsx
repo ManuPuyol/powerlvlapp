@@ -2,8 +2,6 @@ import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/services/profile.service'
 import { ProfileForm } from '@/components/dashboard/profile-form'
 import { AvatarUpload } from '@/components/dashboard/avatar-upload'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 
 export default async function ProfilePage() {
   const profile = await getCurrentProfile()
@@ -13,41 +11,45 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Edit Profile</h1>
-        <p className="text-muted-foreground">Update your personal information</p>
+    <div className="max-w-2xl mx-auto px-4 md:px-8 py-8 space-y-8 animate-fade-in-up">
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 font-mono-tag text-muted-foreground">
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          DASHBOARD / PROFILE
+        </div>
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter leading-[1.05]">
+          Edit your<br />
+          <span className="text-primary">profile.</span>
+        </h1>
+        <p className="text-muted-foreground">
+          Update your personal information and how others see you
+        </p>
       </div>
 
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Profile Photo</CardTitle>
-          <CardDescription>
-            This photo will be visible to other users
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* Avatar */}
+      <section className="border bg-card">
+        <div className="flex items-center justify-between p-5 border-b">
+          <p className="font-mono-tag text-muted-foreground">PROFILE PHOTO</p>
+          <span className="font-mono-tag text-muted-foreground">01</span>
+        </div>
+        <div className="p-5">
           <AvatarUpload
             currentAvatarUrl={profile.avatar_url}
             fullName={profile.full_name}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </section>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Information</CardTitle>
-          <CardDescription>
-            {profile.is_trainer
-              ? 'This information will be visible on your public trainer profile'
-              : 'Update your personal details'
-            }
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* Info */}
+      <section className="border bg-card">
+        <div className="flex items-center justify-between p-5 border-b">
+          <p className="font-mono-tag text-muted-foreground">PROFILE INFO</p>
+          <span className="font-mono-tag text-muted-foreground">02</span>
+        </div>
+        <div className="p-5">
           <ProfileForm profile={profile} />
-        </CardContent>
-      </Card>
+        </div>
+      </section>
     </div>
   )
 }
