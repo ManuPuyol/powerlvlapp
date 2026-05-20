@@ -35,8 +35,8 @@ async function DashboardContent() {
 
   if (profile.is_trainer) {
     const contracts = await getContractsByTrainer(profile.id).catch(() => [])
-    const pendingContracts = contracts.filter((c: any) => c.status === 'pending')
-    const activeContracts = contracts.filter((c: any) => c.status === 'active')
+    const pendingContracts = contracts.filter(c => c.status === 'pending')
+    const activeContracts = contracts.filter(c => c.status === 'active')
 
     return (
       <div className="space-y-8 animate-fade-in-up">
@@ -103,8 +103,8 @@ async function DashboardContent() {
 
   // User dashboard
   const userContracts = await getContractsByClient(profile.id).catch(() => [])
-  const activeTrainers = userContracts.filter((c: any) => c.status === 'active')
-  const pendingRequests = userContracts.filter((c: any) => c.status === 'pending')
+  const activeTrainers = userContracts.filter(c => c.status === 'active')
+  const pendingRequests = userContracts.filter(c => c.status === 'pending')
 
   return (
     <div className="space-y-8 animate-fade-in-up">
@@ -161,7 +161,7 @@ async function DashboardContent() {
             </Link>
           </div>
           <div className="divide-y">
-            {activeTrainers.slice(0, 3).map((contract: any) => (
+            {activeTrainers.slice(0, 3).map(contract => (
               <Link
                 key={contract.id}
                 href={`/trainers/${contract.trainer?.username}`}

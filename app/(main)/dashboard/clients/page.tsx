@@ -21,7 +21,7 @@ async function ClientsContent() {
   if (!profile.is_trainer) redirect('/dashboard')
 
   const contracts = await getContractsByTrainer(profile.id).catch(() => [])
-  const activeClients = contracts.filter((c: any) => c.status === 'active')
+  const activeClients = contracts.filter(c => c.status === 'active')
 
   if (activeClients.length === 0) {
     return (
@@ -36,7 +36,7 @@ async function ClientsContent() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in-up">
-      {activeClients.map((contract: any, idx: number) => (
+      {activeClients.map((contract, idx) => (
         <article
           key={contract.id}
           className="relative border bg-card p-5 transition-all hover:border-primary hover:-translate-y-0.5 hover:shadow-[0_4px_0_-1px_var(--primary)]"
@@ -73,7 +73,7 @@ async function ClientsCount() {
   const profile = await getCurrentProfile()
   if (!profile) return null
   const contracts = await getContractsByTrainer(profile.id).catch(() => [])
-  const count = contracts.filter((c: any) => c.status === 'active').length
+  const count = contracts.filter(c => c.status === 'active').length
   return <span className="text-primary">{String(count).padStart(2, '0')}</span>
 }
 

@@ -1,13 +1,40 @@
 import { createClient } from '@/lib/supabase/server'
 
+export type ContractStatus = 'pending' | 'active' | 'rejected' | 'cancelled' | 'completed'
+
+export type ContractWithClient = {
+  id: string
+  client_id: string | null
+  trainer_id: string | null
+  status: ContractStatus
+  created_at: string | null
+  updated_at: string | null
+  client: {
+    full_name: string | null
+    avatar_url: string | null
+  } | null
+}
+
+export type ContractWithTrainer = {
+  id: string
+  client_id: string | null
+  trainer_id: string | null
+  status: ContractStatus
+  created_at: string | null
+  updated_at: string | null
+  trainer: {
+    full_name: string | null
+    avatar_url: string | null
+    username: string | null
+  } | null
+}
+
 /**
  * Crea un contrato entre un usuario y un trainer
- * Verifica que no exista ya uno activo o pendiente entre ellos
  */
 export async function createContract(clientId: string, trainerId: string) {
   const supabase = await createClient()
 
-  // Verificar que no exista un contrato activo o pendiente
   const { data: existing } = await supabase
     .from('contracts')
     .select('id')
@@ -20,7 +47,6 @@ export async function createContract(clientId: string, trainerId: string) {
     throw new Error('You already have an active or pending contract with this trainer')
   }
 
-  // Crear el contrato
   const { data, error } = await supabase
     .from('contracts')
     .insert({
@@ -38,7 +64,7 @@ export async function createContract(clientId: string, trainerId: string) {
   return data
 }
 
-export async function getContractsByTrainer(trainerId: string) {
+export async function getContractsByTrainer(trainerId: string): Promise<ContractWithClient[]> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -51,36 +77,36 @@ export async function getContractsByTrainer(trainerId: string) {
     throw new Error(error.message)
   }
 
-  return data
+  return (data ?? []) as ContractWithClient[]
 }
 
-export async function getContractsByClient(clientId: string) {
-    const supabase = await createClient()
+export async function getContractsByClient(clientId: string): Promise<ContractWithTrainer[]> {
+  const supabase = await createClient()
 
-    const { data, error } = await supabase
-        .from('contracts')
-        .select('*, trainer:profiles!trainer_id(full_name, avatar_url, username)')
-        .eq('client_id', clientId)
-        .order('created_at', { ascending: false })
+  const { data, error } = await supabase
+    .from('contracts')
+    .select('*, trainer:profiles!trainer_id(full_name, avatar_url, username)')
+    .eq('client_id', clientId)
+    .order('created_at', { ascending: false })
 
-    if (error) {
-        throw new Error(error.message)
-    }
+  if (error) {
+    throw new Error(error.message)
+  }
 
-    return data
+  return (data ?? []) as ContractWithTrainer[]
 }
 
-export async function updateContractStatus(contractId: string, status: string) {
-    const supabase = await createClient()
+export async function updateContractStatus(contractId: string, status: ContractStatus) {
+  const supabase = await createClient()
 
-    const { error } = await supabase
-        .from('contracts')
-        .update({ status })
-        .eq('id', contractId)
+  const { error } = await supabase
+    .from('contracts')
+    .update({ status })
+    .eq('id', contractId)
 
-    if (error) {
-        throw new Error(error.message)
-    }
+  if (error) {
+    throw new Error(error.message)
+  }
 }
 
 /**

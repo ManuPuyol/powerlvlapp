@@ -22,7 +22,7 @@ async function TrainersContent() {
   if (!profile) redirect('/login')
 
   const contracts = await getContractsByClient(profile.id).catch(() => [])
-  const activeTrainers = contracts.filter((c: any) => c.status === 'active')
+  const activeTrainers = contracts.filter(c => c.status === 'active')
 
   if (activeTrainers.length === 0) {
     return (
@@ -42,7 +42,7 @@ async function TrainersContent() {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fade-in-up">
-      {activeTrainers.map((contract: any, idx: number) => (
+      {activeTrainers.map((contract, idx) => (
         <Link
           key={contract.id}
           href={`/trainers/${contract.trainer?.username}`}
@@ -85,7 +85,7 @@ async function TrainersCount() {
   const profile = await getCurrentProfile()
   if (!profile) return null
   const contracts = await getContractsByClient(profile.id).catch(() => [])
-  const count = contracts.filter((c: any) => c.status === 'active').length
+  const count = contracts.filter(c => c.status === 'active').length
   return <span className="text-primary">{String(count).padStart(2, '0')}</span>
 }
 
