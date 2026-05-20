@@ -2,9 +2,8 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/services/profile.service'
 import {
-  getContractsByTrainer,
+  getContractsByTrainerAndStatus,
   countActiveClientsForTrainer,
-  filterByStatus,
 } from '@/services/contracts.service'
 import { Avatar } from '@/components/shared/avatar'
 import { PageHeader } from '@/components/shared/page-header'
@@ -17,8 +16,7 @@ async function ClientsList() {
   if (!profile) redirect('/login')
   if (!profile.is_trainer) redirect('/dashboard')
 
-  const contracts = await getContractsByTrainer(profile.id).catch(() => [])
-  const activeClients = filterByStatus(contracts, 'active')
+  const activeClients = await getContractsByTrainerAndStatus(profile.id, 'active').catch(() => [])
 
   if (activeClients.length === 0) {
     return <EmptyState icon={Users} message="No active clients yet" />

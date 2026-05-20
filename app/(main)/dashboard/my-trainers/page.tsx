@@ -3,9 +3,8 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/services/profile.service'
 import {
-  getContractsByClient,
+  getContractsByClientAndStatus,
   countActiveTrainersForClient,
-  filterByStatus,
 } from '@/services/contracts.service'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/shared/avatar'
@@ -18,8 +17,7 @@ async function TrainersList() {
   const profile = await getCurrentProfile()
   if (!profile) redirect('/login')
 
-  const contracts = await getContractsByClient(profile.id).catch(() => [])
-  const activeTrainers = filterByStatus(contracts, 'active')
+  const activeTrainers = await getContractsByClientAndStatus(profile.id, 'active').catch(() => [])
 
   if (activeTrainers.length === 0) {
     return (

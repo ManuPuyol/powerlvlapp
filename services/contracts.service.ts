@@ -137,17 +137,73 @@ export function filterByStatus<T extends { status: ContractStatus }>(
 }
 
 /**
- * Cuenta contratos activos para un trainer (helper para suspense streams)
+ * Cuenta contratos activos para un trainer (usa count de Supabase, no trae datos)
  */
 export async function countActiveClientsForTrainer(trainerId: string): Promise<number> {
-  const contracts = await getContractsByTrainer(trainerId).catch(() => [])
-  return filterByStatus(contracts, 'active').length
+  const supabase = await createClient()
+
+  const { count } = await supabase
+    .from('contracts')
+    .select('*', { count: 'exact', head: true })
+    .eq('trainer_id', trainerId)
+    .eq('status', 'active')
+
+  return count ?? 0
 }
 
 /**
  * Cuenta contratos activos para un cliente
  */
 export async function countActiveTrainersForClient(clientId: string): Promise<number> {
-  const contracts = await getContractsByClient(clientId).catch(() => [])
-  return filterByStatus(contracts, 'active').length
+  const supabase = await createClient()
+
+  const { count } = await supabase
+    .from('contracts')
+    .select('*', { count: 'exact', head: true })
+    .eq('client_id', clientId)
+    .eq('status', 'active')
+
+  return count ?? 0
+}
+
+/**
+ * Obtiene contratos del trainer filtrados por status (filtra en DB, no en JS)
+ */
+export async function getContractsByTrainerAndStatus(
+  trainerId: string,
+  status: ContractStatus | ContractStatus[]
+): Promise<ContractWithClient[]> {
+  const supabase = await createClient()
+  const statuses = Array.isArray(status) ? status : [status]
+
+  const { data, error } = await supabase
+    .from('contracts')
+    .select('*, client:profiles!client_id(full_name, avatar_url)')
+    .eq('trainer_id', trainerId)
+    .in('status', statuses)
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as ContractWithClient[]
+}
+
+/**
+ * Obtiene contratos del cliente filtrados por status
+ */
+export async function getContractsByClientAndStatus(
+  clientId: string,
+  status: ContractStatus | ContractStatus[]
+): Promise<ContractWithTrainer[]> {
+  const supabase = await createClient()
+  const statuses = Array.isArray(status) ? status : [status]
+
+  const { data, error } = await supabase
+    .from('contracts')
+    .select('*, trainer:profiles!trainer_id(full_name, avatar_url, username)')
+    .eq('client_id', clientId)
+    .in('status', statuses)
+    .order('created_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []) as ContractWithTrainer[]
 }
