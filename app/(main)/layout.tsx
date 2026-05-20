@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getCurrentProfile } from '@/services/profile.service'
+import { getCurrentProfileLite } from '@/services/profile.service'
 import { Sidebar } from '@/components/shared/sidebar'
 
 export default async function MainLayout({
@@ -7,7 +7,7 @@ export default async function MainLayout({
 }: {
   children: React.ReactNode
 }) {
-  const profile = await getCurrentProfile()
+  const profile = await getCurrentProfileLite()
 
   if (profile && !profile.onboarding_completed) {
     redirect('/onboarding')

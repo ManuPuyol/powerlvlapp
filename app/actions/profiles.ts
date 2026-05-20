@@ -2,64 +2,53 @@
 
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-import { onboardingSchema, baseProfileSchema, trainerProfileSchema, visibilitySchema } from '@/lib/validations/profile'
+import {
+  onboardingSchema,
+  baseProfileSchema,
+  trainerProfileSchema,
+  visibilitySchema,
+} from '@/lib/validations/profile'
 import { completeOnboarding, updateProfile } from '@/services/profile.service'
+import { uploadAvatar } from '@/services/storage.service'
 import { getCurrentUser } from '@/services/auth.service'
+import { safeAction, type ActionResult } from '@/lib/utils/action-result'
 
 export async function onboardingAction(formData: FormData) {
-  try {
+  const result = await safeAction(async () => {
     const user = await getCurrentUser()
+    if (!user) throw new Error('Not authenticated')
 
-    if (!user) {
-      return { error: 'Not authenticated' }
-    }
-
-    const rawData = {
+    const validated = onboardingSchema.parse({
       isTrainer: formData.get('isTrainer') as string,
-    }
-
-    const validated = onboardingSchema.parse(rawData)
+    })
     await completeOnboarding(user.id, validated.isTrainer)
-  } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-    return { error: 'An unexpected error occurred' }
-  }
+  })
 
+  if (result.error) return result
   redirect('/dashboard')
 }
 
-export async function updateProfileAction(
-  prevState: { error: string } | { error: null } | null,
-  formData: FormData
-) {
-  try {
+export async function updateProfileAction(_prevState: ActionResult, formData: FormData) {
+  return safeAction(async () => {
     const user = await getCurrentUser()
-
-    if (!user) {
-      return { error: 'Not authenticated' }
-    }
+    if (!user) throw new Error('Not authenticated')
 
     const isTrainer = formData.get('isTrainer') === 'true'
 
     if (isTrainer) {
-      // Parsear specialties desde string separado por comas
       const specialtiesRaw = formData.get('specialties') as string
       const specialties = specialtiesRaw
         ? specialtiesRaw.split(',').map(s => s.trim()).filter(Boolean)
         : []
 
-      const rawData = {
+      const validated = trainerProfileSchema.parse({
         fullName: formData.get('fullName') as string,
         username: formData.get('username') as string,
         bio: formData.get('bio') as string,
         specialties,
         pricePerSession: formData.get('pricePerSession') as string,
         isAvailable: formData.get('isAvailable') === 'true' ? 'true' : 'false',
-      }
-
-      const validated = trainerProfileSchema.parse(rawData)
+      })
 
       await updateProfile(user.id, {
         full_name: validated.fullName,
@@ -70,12 +59,10 @@ export async function updateProfileAction(
         is_available: validated.isAvailable,
       })
     } else {
-      const rawData = {
+      const validated = baseProfileSchema.parse({
         fullName: formData.get('fullName') as string,
         username: formData.get('username') as string,
-      }
-
-      const validated = baseProfileSchema.parse(rawData)
+      })
 
       await updateProfile(user.id, {
         full_name: validated.fullName,
@@ -85,87 +72,43 @@ export async function updateProfileAction(
 
     revalidatePath('/dashboard/profile')
     revalidatePath('/trainers')
-  } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-    return { error: 'An unexpected error occurred' }
-  }
-
-  return { error: null }
+  })
 }
 
-export async function uploadAvatarAction(
-  prevState: { error: string } | { error: null } | null,
-  formData: FormData
-) {
-  try {
+export async function uploadAvatarAction(_prevState: ActionResult, formData: FormData) {
+  return safeAction(async () => {
     const user = await getCurrentUser()
-
-    if (!user) {
-      return { error: 'Not authenticated' }
-    }
+    if (!user) throw new Error('Not authenticated')
 
     const file = formData.get('avatar') as File
+    if (!file || file.size === 0) throw new Error('No file selected')
 
-    if (!file || file.size === 0) {
-      return { error: 'No file selected' }
-    }
-
-    // Validar tamaño (2MB max)
     if (file.size > 2 * 1024 * 1024) {
-      return { error: 'File too large. Max 2MB' }
+      throw new Error('File too large. Max 2MB')
     }
 
-    // Validar tipo
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
-      return { error: 'Invalid file type. Use JPG, PNG or WebP' }
+      throw new Error('Invalid file type. Use JPG, PNG or WebP')
     }
 
-    // Subir imagen
-    const { uploadAvatar } = await import('@/services/storage.service')
     const publicUrl = await uploadAvatar(user.id, file)
-
-    // Actualizar perfil con la URL
     await updateProfile(user.id, { avatar_url: publicUrl })
 
     revalidatePath('/dashboard/profile')
-  } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-    return { error: 'An unexpected error occurred' }
-  }
-
-  return { error: null }
+  })
 }
 
-export async function updateVisibilityAction(
-  prevState: { error: string } | { error: null } | null,
-  formData: FormData
-) {
-  try {
+export async function updateVisibilityAction(_prevState: ActionResult, formData: FormData) {
+  return safeAction(async () => {
     const user = await getCurrentUser()
+    if (!user) throw new Error('Not authenticated')
 
-    if (!user) {
-      return { error: 'Not authenticated' }
-    }
-
-    const rawData = {
+    const validated = visibilitySchema.parse({
       visibility: formData.get('visibility') as string,
-    }
-
-    const validated = visibilitySchema.parse(rawData)
+    })
     await updateProfile(user.id, { profile_visibility: validated.visibility })
 
     revalidatePath('/dashboard/settings')
-  } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-    return { error: 'An unexpected error occurred' }
-  }
-
-  return { error: null }
+  })
 }

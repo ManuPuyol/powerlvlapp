@@ -4,64 +4,43 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { loginSchema, signupSchema } from '@/lib/validations/auth'
 import { login, signup, logout } from '@/services/auth.service'
+import { safeAction, type ActionResult } from '@/lib/utils/action-result'
 
-export async function loginAction(
-  prevState: { error: string } | null,
-  formData: FormData
-) {
-  try {
-    const rawData = {
+export async function loginAction(_prevState: ActionResult, formData: FormData) {
+  const result = await safeAction(async () => {
+    const validated = loginSchema.parse({
       email: formData.get('email') as string,
       password: formData.get('password') as string,
-    }
-
-    const validated = loginSchema.parse(rawData)
+    })
     await login(validated.email, validated.password)
     revalidatePath('/', 'layout')
-  } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-    return { error: 'An unexpected error occurred' }
-  }
+  })
 
+  if (result.error) return result
   redirect('/dashboard')
 }
 
-export async function signupAction(
-  prevState: { error: string } | null,
-  formData: FormData
-) {
-  try {
-    const rawData = {
+export async function signupAction(_prevState: ActionResult, formData: FormData) {
+  const result = await safeAction(async () => {
+    const validated = signupSchema.parse({
       email: formData.get('email') as string,
       password: formData.get('password') as string,
       fullName: formData.get('fullName') as string,
-    }
-
-    const validated = signupSchema.parse(rawData)
+    })
     await signup(validated.email, validated.password, validated.fullName)
     revalidatePath('/', 'layout')
-  } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-    return { error: 'An unexpected error occurred' }
-  }
+  })
 
+  if (result.error) return result
   redirect('/onboarding')
 }
 
 export async function logoutAction() {
-  try {
+  const result = await safeAction(async () => {
     await logout()
     revalidatePath('/', 'layout')
-  } catch (error) {
-    if (error instanceof Error) {
-      return { error: error.message }
-    }
-    return { error: 'An unexpected error occurred' }
-  }
+  })
 
+  if (result.error) return result
   redirect('/login')
 }

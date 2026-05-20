@@ -63,7 +63,8 @@ export async function getTrainerByUsername(username: string) {
 }
 
 /**
- * Obtiene el perfil del usuario actual
+ * Obtiene el perfil del usuario actual (todos los campos)
+ * Usar solo en páginas que necesiten datos completos (profile, settings)
  */
 export async function getCurrentProfile() {
   const supabase = await createClient()
@@ -75,6 +76,28 @@ export async function getCurrentProfile() {
   const { data, error } = await supabase
     .from('profiles')
     .select('id, full_name, username, avatar_url, is_trainer, bio, specialties, price_per_session, is_available, updated_at, onboarding_completed, profile_visibility')
+    .eq('id', user.id)
+    .single()
+
+  if (error) return null
+
+  return data
+}
+
+/**
+ * Versión ligera del perfil para uso frecuente (layout, sidebar, navegación)
+ * Solo trae los campos necesarios para identificar al usuario y su rol.
+ */
+export async function getCurrentProfileLite() {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return null
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, full_name, username, avatar_url, is_trainer, onboarding_completed')
     .eq('id', user.id)
     .single()
 
