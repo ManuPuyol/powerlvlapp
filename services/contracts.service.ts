@@ -125,3 +125,29 @@ export async function getContractBetween(clientId: string, trainerId: string) {
 
   return data
 }
+
+/**
+ * Helpers para filtrar contratos por estado
+ */
+export function filterByStatus<T extends { status: ContractStatus }>(
+  contracts: T[],
+  status: ContractStatus
+): T[] {
+  return contracts.filter(c => c.status === status)
+}
+
+/**
+ * Cuenta contratos activos para un trainer (helper para suspense streams)
+ */
+export async function countActiveClientsForTrainer(trainerId: string): Promise<number> {
+  const contracts = await getContractsByTrainer(trainerId).catch(() => [])
+  return filterByStatus(contracts, 'active').length
+}
+
+/**
+ * Cuenta contratos activos para un cliente
+ */
+export async function countActiveTrainersForClient(clientId: string): Promise<number> {
+  const contracts = await getContractsByClient(clientId).catch(() => [])
+  return filterByStatus(contracts, 'active').length
+}

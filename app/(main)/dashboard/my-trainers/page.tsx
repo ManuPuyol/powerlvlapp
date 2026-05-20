@@ -2,41 +2,38 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/services/profile.service'
-import { getContractsByClient } from '@/services/contracts.service'
+import {
+  getContractsByClient,
+  countActiveTrainersForClient,
+  filterByStatus,
+} from '@/services/contracts.service'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/shared/avatar'
+import { PageHeader } from '@/components/shared/page-header'
+import { EmptyState } from '@/components/shared/empty-state'
+import { CardListSkeleton } from '@/components/shared/skeletons'
 import { Users, ArrowUpRight } from 'lucide-react'
 
-function TrainersSkeleton() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="border h-24 bg-muted animate-pulse" />
-      ))}
-    </div>
-  )
-}
-
-async function TrainersContent() {
+async function TrainersList() {
   const profile = await getCurrentProfile()
   if (!profile) redirect('/login')
 
   const contracts = await getContractsByClient(profile.id).catch(() => [])
-  const activeTrainers = contracts.filter(c => c.status === 'active')
+  const activeTrainers = filterByStatus(contracts, 'active')
 
   if (activeTrainers.length === 0) {
     return (
-      <div className="border border-dashed py-20 text-center space-y-4">
-        <div className="inline-flex w-14 h-14 bg-muted items-center justify-center text-muted-foreground">
-          <Users size={24} />
-        </div>
-        <p className="text-muted-foreground">You don&apos;t have any active trainers yet</p>
-        <Button asChild>
-          <Link href="/trainers">
-            Find a trainer <ArrowUpRight size={14} className="ml-1" />
-          </Link>
-        </Button>
-      </div>
+      <EmptyState
+        icon={Users}
+        message="You don't have any active trainers yet"
+        action={
+          <Button asChild>
+            <Link href="/trainers">
+              Find a trainer <ArrowUpRight size={14} className="ml-1" />
+            </Link>
+          </Button>
+        }
+      />
     )
   }
 
@@ -84,37 +81,26 @@ async function TrainersContent() {
 async function TrainersCount() {
   const profile = await getCurrentProfile()
   if (!profile) return null
-  const contracts = await getContractsByClient(profile.id).catch(() => [])
-  const count = contracts.filter(c => c.status === 'active').length
+  const count = await countActiveTrainersForClient(profile.id)
   return <span className="text-primary">{String(count).padStart(2, '0')}</span>
 }
 
 export default function MyTrainersPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8">
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 font-mono-tag text-muted-foreground">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          DASHBOARD / MY TRAINERS
-        </div>
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter leading-[1.05]">
-              My<br />
-              <span className="text-primary">trainers.</span>
-            </h1>
-            <p className="text-muted-foreground mt-3">
-              Trainers currently helping you reach your goals
-            </p>
-          </div>
-          <div className="font-mono-tag text-muted-foreground">
+      <PageHeader
+        breadcrumb="DASHBOARD / MY TRAINERS"
+        title={<>My <span className="text-primary">trainers.</span></>}
+        description="Trainers currently helping you reach your goals"
+        meta={
+          <>
             ACTIVE <Suspense fallback={<span>--</span>}><TrainersCount /></Suspense>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      <Suspense fallback={<TrainersSkeleton />}>
-        <TrainersContent />
+      <Suspense fallback={<CardListSkeleton cols={2} />}>
+        <TrainersList />
       </Suspense>
     </div>
   )

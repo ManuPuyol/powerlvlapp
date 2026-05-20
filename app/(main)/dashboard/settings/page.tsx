@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/services/profile.service'
 import { VisibilityForm } from '@/components/dashboard/visibility-form'
+import { PageHeader } from '@/components/shared/page-header'
 
 function SettingsSkeleton() {
   return (
@@ -19,10 +20,7 @@ function SettingsSkeleton() {
 
 async function SettingsContent() {
   const profile = await getCurrentProfile()
-
-  if (!profile) {
-    redirect('/login')
-  }
+  if (!profile) redirect('/login')
 
   return (
     <section className="border bg-card">
@@ -43,19 +41,11 @@ async function SettingsContent() {
 export default function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 md:px-8 py-8 space-y-8 animate-fade-in-up">
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 font-mono-tag text-muted-foreground">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          DASHBOARD / SETTINGS
-        </div>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter leading-[1.05]">
-          Account<br />
-          <span className="text-primary">settings.</span>
-        </h1>
-        <p className="text-muted-foreground">
-          Manage your account preferences
-        </p>
-      </div>
+      <PageHeader
+        breadcrumb="DASHBOARD / SETTINGS"
+        title={<>Account<br /><span className="text-primary">settings.</span></>}
+        description="Manage your account preferences"
+      />
 
       <Suspense fallback={<SettingsSkeleton />}>
         <SettingsContent />

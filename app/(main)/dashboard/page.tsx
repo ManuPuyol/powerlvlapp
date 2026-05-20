@@ -2,28 +2,17 @@ import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentProfile } from '@/services/profile.service'
-import { getContractsByTrainer, getContractsByClient } from '@/services/contracts.service'
+import {
+  getContractsByTrainer,
+  getContractsByClient,
+  filterByStatus,
+} from '@/services/contracts.service'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/shared/avatar'
 import { StatBlock } from '@/components/shared/stat-block'
+import { StatGridSkeleton } from '@/components/shared/skeletons'
 import { Users, Dumbbell, TrendingUp, Eye, ArrowUpRight } from 'lucide-react'
 import { PendingContracts } from '@/components/dashboard/pending-contracts'
-
-function DashboardSkeleton() {
-  return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-        <div className="h-8 w-64 bg-muted animate-pulse" />
-        <div className="h-4 w-96 bg-muted animate-pulse" />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-32 bg-muted animate-pulse" />
-        ))}
-      </div>
-    </div>
-  )
-}
 
 async function DashboardContent() {
   const profile = await getCurrentProfile()
@@ -33,25 +22,28 @@ async function DashboardContent() {
   const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })
   const date = now.toLocaleDateString('en-US', { weekday: 'short', day: '2-digit', month: 'short' }).toUpperCase()
 
+  const Greeting = (
+    <div className="space-y-4">
+      <div className="flex items-center gap-3 font-mono-tag text-muted-foreground">
+        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+        {date} • {time}
+        <span className="ml-auto">DASHBOARD / {profile.is_trainer ? 'TRAINER' : 'USER'}</span>
+      </div>
+      <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">
+        Welcome back,<br />
+        <span className="text-primary">{profile.full_name?.split(' ')[0]}</span>
+      </h1>
+    </div>
+  )
+
   if (profile.is_trainer) {
     const contracts = await getContractsByTrainer(profile.id).catch(() => [])
-    const pendingContracts = contracts.filter(c => c.status === 'pending')
-    const activeContracts = contracts.filter(c => c.status === 'active')
+    const pendingContracts = filterByStatus(contracts, 'pending')
+    const activeContracts = filterByStatus(contracts, 'active')
 
     return (
       <div className="space-y-8 animate-fade-in-up">
-        {/* Hero */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-3 font-mono-tag text-muted-foreground">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            {date} • {time}
-            <span className="ml-auto">DASHBOARD / TRAINER</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">
-            Welcome back,<br />
-            <span className="text-primary">{profile.full_name?.split(' ')[0]}</span>
-          </h1>
-        </div>
+        {Greeting}
 
         {pendingContracts.length > 0 && <PendingContracts contracts={pendingContracts} />}
 
@@ -103,22 +95,12 @@ async function DashboardContent() {
 
   // User dashboard
   const userContracts = await getContractsByClient(profile.id).catch(() => [])
-  const activeTrainers = userContracts.filter(c => c.status === 'active')
-  const pendingRequests = userContracts.filter(c => c.status === 'pending')
+  const activeTrainers = filterByStatus(userContracts, 'active')
+  const pendingRequests = filterByStatus(userContracts, 'pending')
 
   return (
     <div className="space-y-8 animate-fade-in-up">
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 font-mono-tag text-muted-foreground">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          {date} • {time}
-          <span className="ml-auto">DASHBOARD / USER</span>
-        </div>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tighter">
-          Welcome back,<br />
-          <span className="text-primary">{profile.full_name?.split(' ')[0]}</span>
-        </h1>
-      </div>
+      {Greeting}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <StatBlock
@@ -167,7 +149,7 @@ async function DashboardContent() {
                 href={`/trainers/${contract.trainer?.username}`}
                 className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors group"
               >
-                <Avatar src={contract.trainer?.avatar_url} name={contract.trainer?.full_name} size="sm" />
+                <Avatar src={contract.trainer?.avatar_url ?? null} name={contract.trainer?.full_name ?? null} size="sm" />
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{contract.trainer?.full_name}</p>
                   <p className="font-mono-tag text-muted-foreground">@{contract.trainer?.username}</p>
@@ -185,7 +167,7 @@ async function DashboardContent() {
 export default function DashboardPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
-      <Suspense fallback={<DashboardSkeleton />}>
+      <Suspense fallback={<StatGridSkeleton />}>
         <DashboardContent />
       </Suspense>
     </div>

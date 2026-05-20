@@ -7,19 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar } from '@/components/shared/avatar'
 import { Check, X } from 'lucide-react'
-
-type Contract = {
-  id: string
-  status: string
-  created_at: string
-  client: {
-    full_name: string
-    avatar_url: string | null
-  }
-}
+import type { ContractWithClient } from '@/services/contracts.service'
 
 type PendingContractsProps = {
-  contracts: Contract[]
+  contracts: ContractWithClient[]
 }
 
 export function PendingContracts({ contracts }: PendingContractsProps) {
@@ -46,11 +37,11 @@ export function PendingContracts({ contracts }: PendingContractsProps) {
           {contracts.map(contract => (
             <div key={contract.id} className="flex items-center justify-between gap-3 p-3 rounded-lg bg-background border">
               <div className="flex items-center gap-3 min-w-0">
-                <Avatar src={contract.client.avatar_url} name={contract.client.full_name} size="sm" />
+                <Avatar src={contract.client?.avatar_url ?? null} name={contract.client?.full_name ?? null} size="sm" />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{contract.client.full_name}</p>
+                  <p className="text-sm font-medium truncate">{contract.client?.full_name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {new Date(contract.created_at).toLocaleDateString()}
+                    {contract.created_at && new Date(contract.created_at).toLocaleDateString()}
                   </p>
                 </div>
               </div>

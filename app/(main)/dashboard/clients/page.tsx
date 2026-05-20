@@ -1,37 +1,27 @@
 import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import { getCurrentProfile } from '@/services/profile.service'
-import { getContractsByTrainer } from '@/services/contracts.service'
+import {
+  getContractsByTrainer,
+  countActiveClientsForTrainer,
+  filterByStatus,
+} from '@/services/contracts.service'
 import { Avatar } from '@/components/shared/avatar'
+import { PageHeader } from '@/components/shared/page-header'
+import { EmptyState } from '@/components/shared/empty-state'
+import { CardListSkeleton } from '@/components/shared/skeletons'
 import { Users } from 'lucide-react'
 
-function ClientsSkeleton() {
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="border h-24 bg-muted animate-pulse" />
-      ))}
-    </div>
-  )
-}
-
-async function ClientsContent() {
+async function ClientsList() {
   const profile = await getCurrentProfile()
   if (!profile) redirect('/login')
   if (!profile.is_trainer) redirect('/dashboard')
 
   const contracts = await getContractsByTrainer(profile.id).catch(() => [])
-  const activeClients = contracts.filter(c => c.status === 'active')
+  const activeClients = filterByStatus(contracts, 'active')
 
   if (activeClients.length === 0) {
-    return (
-      <div className="border border-dashed py-20 text-center space-y-4">
-        <div className="inline-flex w-14 h-14 bg-muted items-center justify-center text-muted-foreground">
-          <Users size={24} />
-        </div>
-        <p className="text-muted-foreground">No active clients yet</p>
-      </div>
-    )
+    return <EmptyState icon={Users} message="No active clients yet" />
   }
 
   return (
@@ -54,7 +44,7 @@ async function ClientsContent() {
             <div className="flex-1 min-w-0">
               <p className="font-bold truncate">{contract.client?.full_name}</p>
               <p className="font-mono-tag text-muted-foreground">
-                SINCE {new Date(contract.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase()}
+                SINCE {contract.created_at && new Date(contract.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase()}
               </p>
             </div>
           </div>
@@ -72,37 +62,26 @@ async function ClientsContent() {
 async function ClientsCount() {
   const profile = await getCurrentProfile()
   if (!profile) return null
-  const contracts = await getContractsByTrainer(profile.id).catch(() => [])
-  const count = contracts.filter(c => c.status === 'active').length
+  const count = await countActiveClientsForTrainer(profile.id)
   return <span className="text-primary">{String(count).padStart(2, '0')}</span>
 }
 
 export default function ClientsPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8">
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 font-mono-tag text-muted-foreground">
-          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-          DASHBOARD / CLIENTS
-        </div>
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter leading-[1.05]">
-              My<br />
-              <span className="text-primary">clients.</span>
-            </h1>
-            <p className="text-muted-foreground mt-3">
-              Active clients currently training with you
-            </p>
-          </div>
-          <div className="font-mono-tag text-muted-foreground">
+      <PageHeader
+        breadcrumb="DASHBOARD / CLIENTS"
+        title={<>My <span className="text-primary">clients.</span></>}
+        description="Active clients currently training with you"
+        meta={
+          <>
             ACTIVE <Suspense fallback={<span>--</span>}><ClientsCount /></Suspense>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      <Suspense fallback={<ClientsSkeleton />}>
-        <ClientsContent />
+      <Suspense fallback={<CardListSkeleton cols={2} />}>
+        <ClientsList />
       </Suspense>
     </div>
   )
