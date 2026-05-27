@@ -44,6 +44,7 @@ export function AvatarUpload({ currentAvatarUrl, fullName }: AvatarUploadProps) 
       <div className="flex items-center gap-4">
         <div className="w-20 h-20 bg-muted flex items-center justify-center overflow-hidden border">
           {preview ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={preview} alt="Avatar" className="w-full h-full object-cover" />
           ) : (
             <span className="text-2xl font-bold font-display">

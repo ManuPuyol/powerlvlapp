@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { cn } from '@/lib/utils/cn'
 
 type AvatarProps = {
@@ -8,22 +9,32 @@ type AvatarProps = {
 }
 
 const sizes = {
-  sm: 'w-8 h-8 text-xs',
-  md: 'w-12 h-12 text-lg',
-  lg: 'w-20 h-20 text-3xl',
+  sm: { className: 'w-8 h-8 text-xs', px: 32 },
+  md: { className: 'w-12 h-12 text-lg', px: 48 },
+  lg: { className: 'w-20 h-20 text-3xl', px: 80 },
 }
 
 export function Avatar({ src, name, size = 'md', className }: AvatarProps) {
+  const config = sizes[size]
+  const initial = name?.charAt(0) ?? '?'
+
   return (
     <div className={cn(
-      'rounded-full bg-muted flex items-center justify-center overflow-hidden font-semibold',
-      sizes[size],
+      'relative rounded-full bg-muted flex items-center justify-center overflow-hidden font-semibold shrink-0',
+      config.className,
       className
     )}>
       {src ? (
-        <img src={src} alt={name ?? 'Avatar'} className="w-full h-full object-cover" />
+        <Image
+          src={src}
+          alt={name ?? 'Avatar'}
+          width={config.px}
+          height={config.px}
+          className="w-full h-full object-cover"
+          unoptimized={src.includes('supabase')}
+        />
       ) : (
-        <span>{name?.charAt(0) ?? '?'}</span>
+        <span>{initial}</span>
       )}
     </div>
   )
