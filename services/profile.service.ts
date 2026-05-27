@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { PG_ERROR_CODES } from '@/lib/constants'
 
@@ -65,8 +66,11 @@ export async function getTrainerByUsername(username: string) {
 /**
  * Obtiene el perfil del usuario actual (todos los campos)
  * Usar solo en páginas que necesiten datos completos (profile, settings)
+ *
+ * Cacheado por React: si se llama varias veces en la misma request,
+ * solo hace UNA query a Supabase.
  */
-export async function getCurrentProfile() {
+export const getCurrentProfile = cache(async () => {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -82,13 +86,16 @@ export async function getCurrentProfile() {
   if (error) return null
 
   return data
-}
+})
 
 /**
  * Versión ligera del perfil para uso frecuente (layout, sidebar, navegación)
  * Solo trae los campos necesarios para identificar al usuario y su rol.
+ *
+ * Cacheado por React: si se llama varias veces en la misma request,
+ * solo hace UNA query a Supabase.
  */
-export async function getCurrentProfileLite() {
+export const getCurrentProfileLite = cache(async () => {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -104,7 +111,7 @@ export async function getCurrentProfileLite() {
   if (error) return null
 
   return data
-}
+})
 
 /**
  * Actualiza el perfil del usuario

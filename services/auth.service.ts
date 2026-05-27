@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 
 /**
@@ -65,8 +66,11 @@ export async function logout() {
 
 /**
  * Obtiene el usuario actual autenticado
+ *
+ * Cacheado por React: si se llama varias veces en la misma request,
+ * solo hace UNA query a Supabase.
  */
-export async function getCurrentUser() {
+export const getCurrentUser = cache(async () => {
   const supabase = await createClient()
 
   const {
@@ -79,4 +83,4 @@ export async function getCurrentUser() {
   }
 
   return user
-}
+})
