@@ -81,9 +81,10 @@ export function Sidebar({ isTrainer, fullName, avatarUrl }: SidebarProps) {
   const trainerLinks: NavItem[] = [
     { number: '01', label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={16} /> },
     { number: '02', label: 'My Clients', href: '/dashboard/clients', icon: <Users size={16} /> },
-    { number: '03', label: 'Trainers', href: '/trainers', icon: <Dumbbell size={16} /> },
-    { number: '04', label: 'Profile', href: '/dashboard/profile', icon: <User size={16} /> },
-    { number: '05', label: 'Settings', href: '/dashboard/settings', icon: <Settings size={16} /> },
+    { number: '03', label: 'Training Plans', href: '/dashboard/training-plans', icon: <Dumbbell size={16} /> },
+    { number: '04', label: 'Trainers', href: '/trainers', icon: <Dumbbell size={16} /> },
+    { number: '05', label: 'Profile', href: '/dashboard/profile', icon: <User size={16} /> },
+    { number: '06', label: 'Settings', href: '/dashboard/settings', icon: <Settings size={16} /> },
   ]
 
   const userLinks: NavItem[] = [
@@ -128,7 +129,7 @@ export function Sidebar({ isTrainer, fullName, avatarUrl }: SidebarProps) {
 
       {/* Footer */}
       <div className="p-3 border-t">
-        <form action={logoutAction}>
+        <form action={async () => { await logoutAction() }}>
           <button
             type="submit"
             className="flex items-center gap-3 px-3 py-2.5 text-sm text-muted-foreground hover:text-destructive transition-colors w-full"
