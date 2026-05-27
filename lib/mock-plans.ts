@@ -163,3 +163,44 @@ export function getMockPlanStats(plan: MockPlan) {
     avgTimePerDay: plan.days.length > 0 ? Math.round(estimatedTime / 60 / plan.days.length) : 0,
   }
 }
+
+/**
+ * Mock: planes asignados al usuario actual (cliente)
+ */
+export type ClientPlanStatus = 'active' | 'upcoming' | 'completed' | 'paused'
+
+export type ClientAssignedPlan = MockPlan & {
+  status: ClientPlanStatus
+  assigned_date: string
+  trainer: { full_name: string; username: string; avatar_url: string | null }
+  progress?: number // 0-100, solo si active
+}
+
+export const MOCK_CLIENT_PLANS: ClientAssignedPlan[] = [
+  {
+    ...MOCK_PLANS[0], // Hypertrophy 4 days
+    status: 'active',
+    assigned_date: '2 weeks ago',
+    progress: 32,
+    trainer: { full_name: 'Sara García', username: 'saragarcia', avatar_url: null },
+  },
+  {
+    ...MOCK_PLANS[1], // Beginner Strength
+    id: 'completed-1',
+    status: 'completed',
+    assigned_date: '3 months ago',
+    progress: 100,
+    trainer: { full_name: 'Sara García', username: 'saragarcia', avatar_url: null },
+  },
+  {
+    ...MOCK_PLANS[2], // Fat Loss Circuit
+    id: 'upcoming-1',
+    status: 'upcoming',
+    assigned_date: 'starts next week',
+    trainer: { full_name: 'Carlos Ruiz', username: 'carlosruiz', avatar_url: null },
+  },
+]
+
+export function getMockClientPlan(id: string): ClientAssignedPlan | undefined {
+  return MOCK_CLIENT_PLANS.find(p => p.id === id)
+}
