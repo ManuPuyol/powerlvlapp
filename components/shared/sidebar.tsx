@@ -7,7 +7,7 @@ import { Menu, LayoutDashboard, Users, User, Settings, LogOut, Dumbbell } from '
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils/cn'
+import { cn } from '@/lib/utils'
 import { logoutAction } from '@/app/actions/auth'
 import { Avatar } from '@/components/shared/avatar'
 
