@@ -89,10 +89,13 @@ export function Sidebar({ isTrainer, fullName, avatarUrl }: SidebarProps) {
 
   const userLinks: NavItem[] = [
     { number: '01', label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={16} /> },
-    { number: '02', label: 'Find Trainers', href: '/trainers', icon: <Dumbbell size={16} /> },
-    { number: '03', label: 'My Trainers', href: '/dashboard/my-trainers', icon: <Users size={16} /> },
-    { number: '04', label: 'Profile', href: '/dashboard/profile', icon: <User size={16} /> },
-    { number: '05', label: 'Settings', href: '/dashboard/settings', icon: <Settings size={16} /> },
+    { number: '02', label: 'My Plan', href: '/dashboard/my-plan', icon: <Dumbbell size={16} /> },
+    { number: '03', label: 'Find Trainers', href: '/trainers', icon: <Dumbbell size={16} /> },
+    { number: '04', label: 'My Trainers', href: '/dashboard/my-trainers', icon: <Users size={16} /> },
+    // TODO: quitar cuando esté listo el flujo. De momento visible para todos para poder probar el builder.
+    { number: '05', label: 'Training Plans', href: '/dashboard/training-plans', icon: <Dumbbell size={16} /> },
+    { number: '06', label: 'Profile', href: '/dashboard/profile', icon: <User size={16} /> },
+    { number: '07', label: 'Settings', href: '/dashboard/settings', icon: <Settings size={16} /> },
   ]
 
   const navItems = isTrainer ? trainerLinks : userLinks

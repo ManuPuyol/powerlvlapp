@@ -16,8 +16,8 @@ import { cn } from '@/lib/utils'
 import {
   PLAN_GOALS, DIFFICULTY_LEVELS,
   type PlanGoal, type DifficultyLevel,
-  type ExerciseTemplate,
 } from '@/lib/exercise-library'
+import type { MockPlan } from '@/lib/mock-plans'
 
 const DAYS_OF_WEEK = [
   { id: 'monday', label: 'MON', full: 'Monday' },
@@ -77,13 +77,20 @@ function move<T>(arr: T[], from: number, to: number): T[] {
   return next
 }
 
-export function PlanBuilder() {
-  const [name, setName] = useState('')
-  const [description, setDescription] = useState('')
-  const [goal, setGoal] = useState<PlanGoal>('hypertrophy')
-  const [difficulty, setDifficulty] = useState<DifficultyLevel>('intermediate')
-  const [weeks, setWeeks] = useState('8')
-  const [days, setDays] = useState<TrainingDay[]>([])
+export function PlanBuilder({ initialPlan }: { initialPlan?: MockPlan } = {}) {
+  const [name, setName] = useState(initialPlan?.name ?? '')
+  const [description, setDescription] = useState(initialPlan?.description ?? '')
+  const [goal, setGoal] = useState<PlanGoal>(initialPlan?.goal ?? 'hypertrophy')
+  const [difficulty, setDifficulty] = useState<DifficultyLevel>(initialPlan?.difficulty ?? 'intermediate')
+  const [weeks, setWeeks] = useState(String(initialPlan?.weeks ?? 8))
+  const [days, setDays] = useState<TrainingDay[]>(
+    initialPlan?.days.map(d => ({
+      id: d.id,
+      day: d.day,
+      name: d.name,
+      exercises: d.exercises.map(e => ({ ...e })),
+    })) ?? []
+  )
   const [previewMode, setPreviewMode] = useState(false)
 
   const usedDays = new Set(days.map(d => d.day))

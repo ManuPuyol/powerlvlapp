@@ -6,103 +6,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
-  Plus, Dumbbell, Users, ArrowUpRight, Search,
-  Copy, Trash2, MoreHorizontal, FileText,
+  Plus, Users, Search, FileText,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { PLAN_GOALS, DIFFICULTY_LEVELS, type PlanGoal, type DifficultyLevel } from '@/lib/exercise-library'
-
-// Mock data
-type MockPlan = {
-  id: string
-  name: string
-  description: string
-  is_template: boolean
-  goal: PlanGoal
-  difficulty: DifficultyLevel
-  weeks: number
-  days_count: number
-  exercises_count: number
-  total_sets: number
-  updated_at: string
-  assigned_to: { full_name: string; username: string } | null
-}
-
-const MOCK_PLANS: MockPlan[] = [
-  {
-    id: '1',
-    name: 'Hypertrophy 4 days',
-    description: 'PPL split for intermediate lifters focused on muscle growth',
-    is_template: true,
-    goal: 'hypertrophy',
-    difficulty: 'intermediate',
-    weeks: 8,
-    days_count: 4,
-    exercises_count: 24,
-    total_sets: 96,
-    updated_at: '2 days ago',
-    assigned_to: null,
-  },
-  {
-    id: '2',
-    name: 'Beginner Strength',
-    description: 'Full body 3 days a week, focus on compound lifts',
-    is_template: true,
-    goal: 'strength',
-    difficulty: 'beginner',
-    weeks: 12,
-    days_count: 3,
-    exercises_count: 18,
-    total_sets: 60,
-    updated_at: '1 week ago',
-    assigned_to: null,
-  },
-  {
-    id: '3',
-    name: 'Fat Loss Circuit',
-    description: 'High intensity circuit training for fat loss',
-    is_template: true,
-    goal: 'fatloss',
-    difficulty: 'intermediate',
-    weeks: 6,
-    days_count: 5,
-    exercises_count: 30,
-    total_sets: 90,
-    updated_at: '3 weeks ago',
-    assigned_to: null,
-  },
-  {
-    id: '4',
-    name: 'Carlos custom plan',
-    description: 'Personalized leg-focused routine',
-    is_template: false,
-    goal: 'hypertrophy',
-    difficulty: 'advanced',
-    weeks: 8,
-    days_count: 5,
-    exercises_count: 30,
-    total_sets: 120,
-    updated_at: 'today',
-    assigned_to: { full_name: 'Carlos Ruiz', username: 'carlosruiz' },
-  },
-  {
-    id: '5',
-    name: 'Maria endurance',
-    description: 'Marathon prep program',
-    is_template: false,
-    goal: 'endurance',
-    difficulty: 'intermediate',
-    weeks: 16,
-    days_count: 5,
-    exercises_count: 22,
-    total_sets: 60,
-    updated_at: 'yesterday',
-    assigned_to: { full_name: 'Maria Sánchez', username: 'mariasanchez' },
-  },
-]
+import { PLAN_GOALS, DIFFICULTY_LEVELS } from '@/lib/exercise-library'
+import { MOCK_PLANS, getMockPlanStats, type MockPlan } from '@/lib/mock-plans'
 
 type FilterType = 'all' | 'templates' | 'assigned'
-type SortKey = 'updated' | 'name' | 'difficulty'
+type SortKey = 'updated' | 'name'
 
 export default function TrainingPlansPage() {
   const [search, setSearch] = useState('')
@@ -276,23 +187,20 @@ function StatTile({ label, value, icon, accent }: { label: string; value: number
 function PlanCard({ plan, idx }: { plan: MockPlan; idx: number }) {
   const goalInfo = PLAN_GOALS.find(g => g.id === plan.goal)
   const difficultyInfo = DIFFICULTY_LEVELS.find(d => d.id === plan.difficulty)
+  const stats = getMockPlanStats(plan)
 
   return (
     <Link
       href={`/dashboard/training-plans/${plan.id}`}
       className="group relative border bg-card p-5 transition-all hover:border-primary hover:-translate-y-0.5 hover:shadow-[0_4px_0_-1px_var(--primary)]"
     >
-      {/* Top stripe */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-foreground/10 group-hover:bg-primary transition-colors" />
 
-      {/* Index */}
       <div className="absolute top-0 right-0 font-mono-tag text-muted-foreground p-3">
         {String(idx + 1).padStart(2, '0')}
       </div>
 
       <div className="space-y-3 pr-8">
-
-        {/* Type indicator */}
         {plan.is_template ? (
           <div className="inline-flex items-center gap-1.5 font-mono-tag text-muted-foreground">
             <FileText size={10} />
@@ -305,13 +213,11 @@ function PlanCard({ plan, idx }: { plan: MockPlan; idx: number }) {
           </div>
         )}
 
-        {/* Title */}
         <div>
           <p className="font-bold group-hover:text-primary transition-colors">{plan.name}</p>
           <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{plan.description}</p>
         </div>
 
-        {/* Tags */}
         <div className="flex items-center gap-2 flex-wrap text-xs">
           <span className={cn('font-mono-tag', goalInfo?.color)}>
             {goalInfo?.label.toUpperCase()}
@@ -334,12 +240,11 @@ function PlanCard({ plan, idx }: { plan: MockPlan; idx: number }) {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="mt-4 pt-3 border-t flex items-center justify-between">
         <div className="flex gap-3 font-mono-tag text-muted-foreground text-xs">
-          <span>{plan.days_count}D</span>
+          <span>{stats.days}D</span>
           <span>•</span>
-          <span>{plan.exercises_count}EX</span>
+          <span>{stats.exercises}EX</span>
           <span>•</span>
           <span>{plan.weeks}W</span>
         </div>
