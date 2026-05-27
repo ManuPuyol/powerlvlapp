@@ -204,3 +204,23 @@ export const MOCK_CLIENT_PLANS: ClientAssignedPlan[] = [
 export function getMockClientPlan(id: string): ClientAssignedPlan | undefined {
   return MOCK_CLIENT_PLANS.find(p => p.id === id)
 }
+
+/**
+ * Mock: clientes activos del trainer (para asignar planes)
+ */
+export type MockClient = {
+  id: string
+  full_name: string
+  username: string
+  avatar_url: string | null
+  active_plans: number
+  since: string
+}
+
+export const MOCK_CLIENTS: MockClient[] = [
+  { id: 'c1', full_name: 'Carlos Ruiz', username: 'carlosruiz', avatar_url: null, active_plans: 1, since: '3 months ago' },
+  { id: 'c2', full_name: 'Maria Sánchez', username: 'mariasanchez', avatar_url: null, active_plans: 1, since: '6 weeks ago' },
+  { id: 'c3', full_name: 'Pedro Gómez', username: 'pedrogomez', avatar_url: null, active_plans: 0, since: '2 weeks ago' },
+  { id: 'c4', full_name: 'Laura Pérez', username: 'lauraperez', avatar_url: null, active_plans: 0, since: '1 week ago' },
+  { id: 'c5', full_name: 'Diego Martín', username: 'diegomartin', avatar_url: null, active_plans: 2, since: '4 months ago' },
+]

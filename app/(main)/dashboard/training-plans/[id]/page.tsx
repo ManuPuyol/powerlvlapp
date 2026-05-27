@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Avatar } from '@/components/shared/avatar'
+import { AssignPlanDialog } from '@/components/training-plans/assign-plan-dialog'
 import { getMockPlan, getMockPlanStats } from '@/lib/mock-plans'
 import { PLAN_GOALS, DIFFICULTY_LEVELS } from '@/lib/exercise-library'
 import { cn } from '@/lib/utils'
@@ -130,10 +131,15 @@ export default async function PlanDetailPage({ params }: Props) {
               </Link>
             </Button>
             {plan.is_template && (
-              <Button variant="outline">
-                <UserPlus size={14} className="mr-1.5" />
-                Assign to client
-              </Button>
+              <AssignPlanDialog
+                planName={plan.name}
+                trigger={
+                  <Button variant="outline">
+                    <UserPlus size={14} className="mr-1.5" />
+                    Assign to client
+                  </Button>
+                }
+              />
             )}
             <Button variant="outline">
               <Copy size={14} className="mr-1.5" />
