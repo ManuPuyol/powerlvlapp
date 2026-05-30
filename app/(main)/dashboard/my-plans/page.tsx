@@ -269,9 +269,11 @@ function FeaturedActivePlan({
               </div>
 
               <div className="flex items-center gap-2 flex-wrap pt-2">
-                <Button size="lg">
-                  <Play size={14} className="mr-1.5" />
-                  Start workout
+                <Button asChild size="lg">
+                  <Link href={`/dashboard/my-plans/${plan.id}/workout`}>
+                    <Play size={14} className="mr-1.5" />
+                    Start workout
+                  </Link>
                 </Button>
                 <Button asChild variant="outline" size="lg">
                   <Link href={`/dashboard/my-plans/${plan.id}`}>View plan</Link>

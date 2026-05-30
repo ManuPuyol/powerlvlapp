@@ -9,7 +9,6 @@ import {
   ArrowLeft, Calendar, Play, Clock, Circle,
   Image as ImageIcon, Video, Pause, CheckCircle2,
 } from 'lucide-react'
-
 const DAYS_OF_WEEK = [
   { id: 'monday', label: 'MON', full: 'Monday' },
   { id: 'tuesday', label: 'TUE', full: 'Tuesday' },
@@ -143,9 +142,11 @@ export default async function ClientPlanDetailPage({ params }: Props) {
               {todayPlanDay.exercises.length} EXERCISES • {todayPlanDay.exercises.reduce((s, e) => s + e.sets, 0)} SETS
             </p>
           </div>
-          <Button size="lg">
-            <Play size={14} className="mr-1.5" />
-            Start workout
+          <Button asChild size="lg">
+            <Link href={`/dashboard/my-plans/${plan.id}/workout`}>
+              <Play size={14} className="mr-1.5" />
+              Start workout
+            </Link>
           </Button>
         </div>
       )}
@@ -218,10 +219,18 @@ export default async function ClientPlanDetailPage({ params }: Props) {
                     </p>
                     <h3 className="font-bold text-lg">{day.name}</h3>
                   </div>
-                  <div className="text-right">
+                  <div className="flex items-center gap-3">
                     <p className="font-mono-tag text-primary inline-flex items-center gap-1">
                       <Clock size={10} /> {Math.round(time / 60)}m
                     </p>
+                    {isActive && (
+                      <Button asChild size="sm" variant={isToday ? 'default' : 'outline'}>
+                        <Link href={`/dashboard/my-plans/${plan.id}/workout?day=${day.day}`}>
+                          <Play size={12} className="mr-1" />
+                          Start
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                 </div>
 
