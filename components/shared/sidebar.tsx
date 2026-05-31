@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, LayoutDashboard, Users, User, Settings, LogOut, Dumbbell, RefreshCw } from 'lucide-react'
+import { Menu, LayoutDashboard, Users, User, Settings, LogOut, Dumbbell, UtensilsCrossed, RefreshCw } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
@@ -83,9 +83,10 @@ export function Sidebar({ isTrainer, fullName, avatarUrl }: SidebarProps) {
     { number: '01', label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={16} /> },
     { number: '02', label: 'My Clients', href: '/dashboard/clients', icon: <Users size={16} /> },
     { number: '03', label: 'Training Plans', href: '/dashboard/training-plans', icon: <Dumbbell size={16} /> },
-    { number: '04', label: 'Trainers', href: '/trainers', icon: <Dumbbell size={16} /> },
-    { number: '05', label: 'Profile', href: '/dashboard/profile', icon: <User size={16} /> },
-    { number: '06', label: 'Settings', href: '/dashboard/settings', icon: <Settings size={16} /> },
+    { number: '04', label: 'Diet Plans', href: '/dashboard/diet-plans', icon: <UtensilsCrossed size={16} /> },
+    { number: '05', label: 'Trainers', href: '/trainers', icon: <Dumbbell size={16} /> },
+    { number: '06', label: 'Profile', href: '/dashboard/profile', icon: <User size={16} /> },
+    { number: '07', label: 'Settings', href: '/dashboard/settings', icon: <Settings size={16} /> },
   ]
 
   const userLinks: NavItem[] = [
@@ -95,8 +96,9 @@ export function Sidebar({ isTrainer, fullName, avatarUrl }: SidebarProps) {
     { number: '04', label: 'My Trainers', href: '/dashboard/my-trainers', icon: <Users size={16} /> },
     // TODO: quitar cuando esté listo el flujo. De momento visible para todos para poder probar el builder.
     { number: '05', label: 'Training Plans', href: '/dashboard/training-plans', icon: <Dumbbell size={16} /> },
-    { number: '06', label: 'Profile', href: '/dashboard/profile', icon: <User size={16} /> },
-    { number: '07', label: 'Settings', href: '/dashboard/settings', icon: <Settings size={16} /> },
+    { number: '06', label: 'Diet Plans', href: '/dashboard/diet-plans', icon: <UtensilsCrossed size={16} /> },
+    { number: '07', label: 'Profile', href: '/dashboard/profile', icon: <User size={16} /> },
+    { number: '08', label: 'Settings', href: '/dashboard/settings', icon: <Settings size={16} /> },
   ]
 
   const navItems = isTrainer ? trainerLinks : userLinks
