@@ -224,3 +224,21 @@ export const MOCK_CLIENTS: MockClient[] = [
   { id: 'c4', full_name: 'Laura Pérez', username: 'lauraperez', avatar_url: null, active_plans: 0, since: '1 week ago' },
   { id: 'c5', full_name: 'Diego Martín', username: 'diegomartin', avatar_url: null, active_plans: 2, since: '4 months ago' },
 ]
+
+export function getMockClient(id: string): MockClient | undefined {
+  return MOCK_CLIENTS.find(c => c.id === id)
+}
+
+/**
+ * Mock: planes asignados a un cliente concreto (vista del trainer)
+ */
+export function getMockPlansForClient(clientId: string): ClientAssignedPlan[] {
+  // De momento devolvemos un subset mock según el cliente
+  if (clientId === 'c1') {
+    return [MOCK_CLIENT_PLANS[0], MOCK_CLIENT_PLANS[1]]
+  }
+  if (clientId === 'c2') {
+    return [MOCK_CLIENT_PLANS[2]]
+  }
+  return []
+}

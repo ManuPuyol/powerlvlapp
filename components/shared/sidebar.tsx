@@ -3,12 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
-import { Menu, LayoutDashboard, Users, User, Settings, LogOut, Dumbbell } from 'lucide-react'
+import { Menu, LayoutDashboard, Users, User, Settings, LogOut, Dumbbell, RefreshCw } from 'lucide-react'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { logoutAction } from '@/app/actions/auth'
+import { toggleDevRole } from '@/app/actions/dev'
 import { Avatar } from '@/components/shared/avatar'
 
 type NavItem = {
@@ -118,6 +119,17 @@ export function Sidebar({ isTrainer, fullName, avatarUrl }: SidebarProps) {
             </p>
           </div>
         </div>
+
+        {/* DEV: role toggle. TODO: quitar en producción */}
+        <form action={async () => { await toggleDevRole(!isTrainer) }}>
+          <button
+            type="submit"
+            className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-1.5 border border-dashed border-primary/40 text-primary font-mono-tag text-[10px] hover:bg-primary/5 transition-colors"
+          >
+            <RefreshCw size={10} />
+            DEV: SWITCH TO {isTrainer ? 'USER' : 'TRAINER'}
+          </button>
+        </form>
       </div>
 
       {/* Section label */}
